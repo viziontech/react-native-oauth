@@ -6,9 +6,6 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -403,32 +400,13 @@ class OAuthManagerModule extends ReactContextBaseJavaModule {
     WritableMap response = Arguments.createMap();
 
     Log.d(TAG, "Credential raw response: " + accessToken.getRawResponse());
-
-    /* Some things return as JSON, some as x-www-form-urlencoded (querystring) */
-
-    Map accessTokenMap = null;
-    try {
-      accessTokenMap = new Gson().fromJson(accessToken.getRawResponse(), Map.class);
-    } catch (JsonSyntaxException e) {
-      /*
-      failed to parse as JSON, so turn it into a HashMap which looks like the one we'd
-      get back from the JSON parser, so the rest of the code continues unchanged.
-      */
-      Log.d(TAG, "Credential looks like a querystring; parsing as such");
-      accessTokenMap = new HashMap();
-      accessTokenMap.put("user_id", accessToken.getParameter("user_id"));
-      accessTokenMap.put("oauth_token_secret", accessToken.getParameter("oauth_token_secret"));
-      accessTokenMap.put("token_type", accessToken.getParameter("token_type"));
-    }
-
-
+    
     resp.putString("status", "ok");
     resp.putBoolean("authorized", true);
     resp.putString("provider", providerName);
 
     String uuid = accessToken.getParameter("user_id");
     response.putString("uuid", uuid);
-    String oauthTokenSecret = (String) accessToken.getParameter("oauth_token_secret");
     
     String tokenType = (String) accessToken.getParameter("token_type");
     if (tokenType == null) {
@@ -438,8 +416,8 @@ class OAuthManagerModule extends ReactContextBaseJavaModule {
     String consumerKey = (String) cfg.get("consumer_key");
 
     WritableMap credentials = Arguments.createMap();
-    credentials.putString("access_token", accessToken.getToken());
-    credentials.putString("access_token_secret", oauthTokenSecret);
+    credentials.putString("accessToken", accessToken.getToken());
+    credentials.putString("accessTokenSecret", accessToken.getTokenSecret());
     credentials.putString("type", tokenType);
     credentials.putString("consumerKey", consumerKey);
 
