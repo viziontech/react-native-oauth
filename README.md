@@ -1,3 +1,5 @@
+## ⚠️ This fork solves Google User Agent and Scope errors
+
 ## react-native-oauth
 
 The `react-native-oauth` library provides an interface to OAuth 1.0 and OAuth 2.0 providers with support for the following providers for React Native apps:
